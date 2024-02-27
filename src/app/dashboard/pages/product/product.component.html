@@ -1,0 +1,226 @@
+<p-toast></p-toast>
+<p-toolbar styleClass="mb-4 gap-2">
+  <ng-template pTemplate="left">
+    <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2"
+      (click)="openCreateProductModal()"></button>
+  </ng-template>
+</p-toolbar>
+
+<p-table #dt2 [value]="products" [rows]="10" [paginator]="true" [globalFilterFields]="['nombre', 'codigo_barras']"
+  [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+  currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} productos en total"
+  [showCurrentPageReport]="true">
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center justify-content-between">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" name="search" (input)="applyFilterGlobal($event, 'contains')"
+          placeholder="Search..." />
+      </span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="nombre" style="min-width: 15rem">
+        Nombre <p-sortIcon field="nombre"></p-sortIcon>
+      </th>
+      <th pSortableColumn="precio">
+        Precio <p-sortIcon field="precio"></p-sortIcon>
+      </th>
+      <th pSortableColumn="precio_venta">
+        Precio de venta <p-sortIcon field="precio_venta"></p-sortIcon>
+      </th>
+      <th pSortableColumn="color">
+        Color <p-sortIcon field="color"></p-sortIcon>
+      </th>
+      <th pSortableColumn="tamano">
+        Tamaño <p-sortIcon field="tamaño"></p-sortIcon>
+      </th>
+      <th pSortableColumn="cantidad" style="min-width: 10rem">
+        Cantidad <p-sortIcon field="cantidad"></p-sortIcon>
+      </th>
+      <th pSortableColumn="stock_minimo">
+        Stock Minimo <p-sortIcon field="stock_minimo"></p-sortIcon>
+      </th>
+      <th></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-product>
+    <tr>
+      <td>{{ product.nombre }}</td>
+      <td>
+        {{product.precio | currency}}
+      </td>
+      <td>
+        {{product.precio_venta | currency}}
+      </td>
+      <td>
+        {{product.color}}
+      </td>
+      <td>
+        {{product.tamano}}
+      </td>
+      <td>{{ product.cantidad | number }}</td>
+      <td>{{ product.stock_minimo | number }}</td>
+      <td>
+        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2"
+          (click)="openEditProductModal(product)"></button>
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>
+
+<p-dialog [(visible)]="productDialog" [style]="{ width: '450px', height: 'auto' }" header="Agregar Producto"
+  [modal]="true" styleClass="p-fluid" [formGroup]="productForm" [blockScroll]="false">
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="nombre">Nombre:</label>
+      <input id="nombre" type="text" class="w-full" pInputText formControlName="nombre">
+      @if(productDialogsubmitted && productForm.get('nombre')?.status === 'INVALID') {
+      <small class="p-error">El nombre debe de tener al menos 3 caracteres.</small>
+      }
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="precio">Precio:</label>
+        <p-inputNumber id="precio" mode="currency" currency="MXN" locale="es-MX"
+          formControlName="precio"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('precio')?.status === 'INVALID') {
+        <small class="p-error">El precio debe de ser mayor o igual a 0</small>
+        }
+      </div>
+      <div class="field col">
+        <label for="precioventa">Precio de venta:</label>
+        <p-inputNumber id="precioventa" mode="currency" currency="MXN" locale="es-MX"
+          formControlName="precio_venta"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('precio_venta')?.status === 'INVALID') {
+        <small class="p-error">El precio debe de ser mayor o igual a 0</small>
+        }
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="codigo">Codigo de barras:</label>
+        <input id="codigo" type="text" class="w-full" pInputText formControlName="codigo_barras">
+        @if(productDialogsubmitted && productForm.get('codigo_barras')?.status === 'INVALID') {
+        <small class="p-error">El codido
+          de barras debe de tener al menos 3 caracteres.</small>
+        }
+      </div>
+      <div class="field col">
+        <label for="tipoproducto">Tipo de producto</label>
+        <p-dropdown id="tipoproducto" [options]="productTypes" formControlName="tipoProductoId" optionLabel="label"
+          optionValue="value">
+        </p-dropdown>
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="color">Color:</label>
+        <input id="color" type="text" class="w-full" pInputText formControlName="color">
+      </div>
+      <div class="field col">
+        <label for="tamano">Tamaño:</label>
+        <input id="tamano" type="text" class="w-full" pInputText formControlName="tamano">
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="stock">Stock:</label>
+        <p-inputNumber id="stock" formControlName="cantidad"></p-inputNumber>
+      </div>
+      <div class="field col">
+        <label for="stock_minimo">Stock minimo</label>
+        <p-inputNumber id="stock_minimo" formControlName="stock_minimo"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('stock_minimo')?.errors) {
+        <small class="p-error">El stock minimo debe de ser mayor al de la cantidad de productos</small>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+      (click)="hideProductDialog()"></button>
+    <button pButton pRipple label="Agregar" icon="pi pi-check" class="p-button-text" (click)="saveProduct()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="editProductDialog" [style]="{ width: '450px' }" header="Editar Producto" [modal]="true"
+  styleClass="p-fluid" [formGroup]="updateProductForm">
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="editnombre">Nombre:</label>
+      <input id="editnombre" type="text" class="w-full" pInputText formControlName="nombre">
+      @if(productDialogsubmitted && productForm.get('nombre')?.status === 'INVALID') {
+      <small class="p-error">El nombre debe de tener al menos 3 caracteres.</small>
+      }
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="editprecio">Precio:</label>
+        <p-inputNumber id="editprecio" mode="currency" currency="MXN" locale="es-MX"
+          formControlName="precio"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('precio')?.status === 'INVALID') {
+        <small class="p-error">El precio debe de ser mayor o igual a 0</small>
+        }
+      </div>
+      <div class="field col">
+        <label for="editprecioventa">Precio de venta:</label>
+        <p-inputNumber id="editprecioventa" mode="currency" currency="MXN" locale="es-MX"
+          formControlName="precio_venta"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('precio_venta')?.status === 'INVALID') {
+        <small class="p-error">El precio debe de ser mayor o igual a 0</small>
+        }
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="editcodigo">Codigo de barras:</label>
+        <input id="editcodigo" type="text" class="w-full" pInputText formControlName="codigo_barras">
+        @if(productDialogsubmitted && productForm.get('codigo_barras')?.status === 'INVALID') {
+        <small class="p-error">El codido
+          de barras debe de tener al menos 3 caracteres.</small>
+        }
+      </div>
+      <div class="field col">
+        <label for="edittipoproducto">Tipo de producto</label>
+        <p-dropdown id="edittipoproducto" [options]="productTypes" formControlName="tipoProductoId" optionLabel="label"
+          optionValue="value">
+        </p-dropdown>
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="editcolor">Color:</label>
+        <input id="editcolor" type="text" class="w-full" pInputText formControlName="color">
+      </div>
+      <div class="field col">
+        <label for="edittamano">Tamaño:</label>
+        <input id="edittamano" type="text" class="w-full" pInputText formControlName="tamano">
+      </div>
+    </div>
+    <div class="formgrid grid">
+      <div class="field col">
+        <label for="editstock">Stock:</label>
+        <p-inputNumber id="editstock" formControlName="cantidad"></p-inputNumber>
+      </div>
+      <div class="field col">
+        <label for="editstock_minimo">Stock minimo</label>
+        <p-inputNumber id="editstock_minimo" formControlName="stock_minimo"></p-inputNumber>
+        @if(productDialogsubmitted && productForm.get('stock_minimo')?.errors) {
+        <small class="p-error">El stock minimo debe de ser mayor al de la cantidad de productos</small>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text"
+      (click)="hideEditProductDialog()"></button>
+    <button pButton pRipple label="Actualizar" icon="pi pi-check" class="p-button-text"
+      (click)="editProduct()"></button>
+  </ng-template>
+</p-dialog>

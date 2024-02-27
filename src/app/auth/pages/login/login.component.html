@@ -1,0 +1,15 @@
+<p-toast></p-toast>
+<form class="p-3 shadow-2" (ngSubmit)="login()" [formGroup]="loginForm">
+  <h1 class="text-center">Login</h1>
+  <div class="field">
+    <label for="usuario">Usuario:</label>
+    <input id="usuario" type="text" pInputText class="w-full" formControlName="username" />
+  </div>
+  <div class="field">
+    <label for="password">Password:</label>
+    <input id="password" type="password" pPassword class="w-full" [feedback]="false" formControlName="password" />
+  </div>
+  <div class="field">
+    <button pButton type="submit" class="w-full flex justify-content-center">Ingresar</button>
+  </div>
+</form>
